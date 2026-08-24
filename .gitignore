@@ -9,3 +9,7 @@ uploads/
 
 # Ignora o arquivo com as suas senhas
 config.php
+
+# Ignora pastas de sistema da Hostinger e arquivos soltos
+.private/
+foto-perfil.jpg
