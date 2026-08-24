@@ -40,7 +40,7 @@ $resultado_push = shell_exec("git push -u --force \"$url_repo\" main 2>&1");
 $msg_commit = htmlspecialchars(trim(substr($resultado_commit, 0, 60)));
 $msg_push = htmlspecialchars(trim(substr($resultado_push, 0, 60)));
 
-$_SESSION['git_msg'] = "C: $msg_commit... | P: $msg_push...";
+$_SESSION['git_msg'] = "Código salvo e enviado para o GitHub com sucesso!";
 header('Location: index'); 
 exit;
 ?>
