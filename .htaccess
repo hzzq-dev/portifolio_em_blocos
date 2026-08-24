@@ -1,0 +1,11 @@
+RewriteEngine On
+
+# 1. Esconde o "index.php" da URL principal (Redireciona para a raiz)
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /index\.php\ HTTP/
+RewriteRule ^index\.php$ / [R=301,L]
+
+# 2. Esconde a extensão .php de todas as outras páginas
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.*)$ $1.php [L]

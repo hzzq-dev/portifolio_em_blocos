@@ -1,0 +1,10 @@
+# Ignora o banco de dados (seus cards, ordem, etc)
+admin/database.sqlite
+
+# Ignora a pasta de imagens dos cards
+uploads/
+0000novo_temas_dev_0000/
+0000GUSVISENTINI0000/
+
+# Ignora o arquivo com as suas senhas
+config.php
