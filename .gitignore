@@ -5,6 +5,7 @@ admin/database.sqlite
 uploads/
 0000novo_temas_dev_0000/
 0000GUSVISENTINI0000/
+.private
 
 # Ignora o arquivo com as suas senhas
 config.php
