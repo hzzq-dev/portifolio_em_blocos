@@ -22,8 +22,9 @@ chdir(__DIR__ . '/../');
 shell_exec('git init 2>&1');
 
 // 2. CONFIGURA O USUÁRIO LOCALMENTE (Sem o --global para não bugar o usuário fantasma do servidor)
-shell_exec('git config user.email "site@visentini.com.br" 2>&1');
+shell_exec('git config user.email "gustavo@visentini.com.br" 2>&1');
 shell_exec('git config user.name "Painel Admin" 2>&1');
+shell_exec('git rm -r --cached .private foto-perfil.jpg 2>&1');
 
 // 3. ADICIONA OS ARQUIVOS
 shell_exec('git add . 2>&1');
