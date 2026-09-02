@@ -17,19 +17,21 @@
         }
 
         * { box-sizing: border-box; }
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; margin: 0; padding: 2rem; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
         
-        /* HEADER (Mesmo da Home) */
-        header { text-align: center; margin-bottom: 4rem; margin-top: 2rem; width: 100%; max-width: 1200px; }
-        h1 { font-size: 3.5rem; font-weight: 900; letter-spacing: -2px; margin: 0; background: var(--grad-pride); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .subtitle { font-size: 1.1rem; color: #888; margin-top: 0.5rem; margin-bottom: 2rem; }
-        nav a { color: #fff; text-decoration: none; font-weight: 700; font-size: 1.1rem; margin: 0 1rem; padding-bottom: 5px; border-bottom: 2px solid transparent; transition: border-color 0.3s ease, color 0.3s ease; }
+        /* OTIMIZAÇÃO: Menos espaço em branco, flex centralizado */
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; margin: 0; padding: 1.5rem 1rem; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        
+        /* OTIMIZAÇÃO: Cabeçalho compacto */
+        header { text-align: center; margin-bottom: 1.5rem; margin-top: 0; width: 100%; max-width: 1200px; }
+        h1 { font-size: 3rem; font-weight: 900; letter-spacing: -2px; margin: 0; background: var(--grad-pride); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .subtitle { font-size: 1rem; color: #888; margin-top: 0.2rem; margin-bottom: 1rem; }
+        nav a { color: #fff; text-decoration: none; font-weight: 700; font-size: 1rem; margin: 0 1rem; padding-bottom: 5px; border-bottom: 2px solid transparent; transition: border-color 0.3s ease, color 0.3s ease; }
         nav a:hover { color: #FFD800; border-bottom: 2px solid #FFD800; }
 
-        /* LAYOUT SOBRE */
+        /* LAYOUT SOBRE OTIMIZADO */
         .sobre-container {
             display: flex;
-            gap: 4rem;
+            gap: 2.5rem; /* OTIMIZAÇÃO: Gap menor entre foto e texto */
             max-width: 1000px;
             width: 100%;
             align-items: center;
@@ -43,7 +45,6 @@
             position: relative;
         }
 
-        /* Degradê sutil em cima da foto */
         .sobre-foto::after {
             content: '';
             position: absolute;
@@ -61,8 +62,8 @@
 
         .sobre-texto {
             flex: 1.5;
-            font-size: 1.2rem;
-            line-height: 1.8;
+            font-size: 1.15rem; /* Levemente menor para caber melhor na tela */
+            line-height: 1.7;
             color: #d1d1d1;
         }
 
@@ -70,7 +71,7 @@
             font-size: 2.5rem;
             color: #fff;
             margin-top: 0;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
             font-weight: 900;
             letter-spacing: -1px;
         }
@@ -84,16 +85,17 @@
         }
 
         @media (max-width: 768px) {
-            .sobre-container { flex-direction: column; gap: 2rem; }
-            h1 { font-size: 2.5rem; }
+            .sobre-container { flex-direction: column; gap: 1.5rem; text-align: center; }
+            h1 { font-size: 2.2rem; }
             .sobre-foto { width: 100%; max-width: 400px; margin: 0 auto; }
+            .sobre-texto h2 { font-size: 2rem; }
         }
     </style>
 </head>
 <body>
 
     <header>
-        <a href="index.php" style="text-decoration: none;"><h1>@gusvisentini</h1></a>
+        <a href="/" style="text-decoration: none;"><h1>@gusvisentini</h1></a>
         <p class="subtitle">Mídia, Código e Ideias.</p>
         <nav>
             <a href="/">Início</a>
@@ -104,8 +106,7 @@
 
     <main class="sobre-container">
         <div class="sobre-foto">
-            <!-- Coloque sua foto na mesma pasta ou crie uma pasta imagens/ -->
-            <img src="foto-perfil.jpg" alt="Foto de Gustavo Visentini">
+            <img src="foto-perfil.png" alt="Foto de Gustavo Visentini">
         </div>
         
         <div class="sobre-texto">

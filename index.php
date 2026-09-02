@@ -32,13 +32,19 @@ try {
         }
 
         * { box-sizing: border-box; }
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; margin: 0; padding: 2rem; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
-        header { text-align: center; margin-bottom: 4rem; margin-top: 2rem; width: 100%; max-width: 1200px; }
-        h1 { font-size: 3.5rem; font-weight: 900; letter-spacing: -2px; margin: 0; background: var(--grad-pride); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .subtitle { font-size: 1.1rem; color: #888; margin-top: 0.5rem; margin-bottom: 2rem; }
-        nav a { color: #fff; text-decoration: none; font-weight: 700; font-size: 1.1rem; margin: 0 1rem; padding-bottom: 5px; border-bottom: 2px solid transparent; transition: border-color 0.3s ease, color 0.3s ease; }
+        
+        /* OTIMIZAÇÃO: Menos espaço em branco, flex centralizado */
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; margin: 0; padding: 1.5rem 1rem; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        
+        /* OTIMIZAÇÃO: Cabeçalho compacto */
+        header { text-align: center; margin-bottom: 1.5rem; margin-top: 0; width: 100%; max-width: 1200px; }
+        h1 { font-size: 3rem; font-weight: 900; letter-spacing: -2px; margin: 0; background: var(--grad-pride); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .subtitle { font-size: 1rem; color: #888; margin-top: 0.2rem; margin-bottom: 1rem; }
+        nav a { color: #fff; text-decoration: none; font-weight: 700; font-size: 1rem; margin: 0 1rem; padding-bottom: 5px; border-bottom: 2px solid transparent; transition: border-color 0.3s ease, color 0.3s ease; }
         nav a:hover { color: #FFD800; border-bottom: 2px solid #FFD800; }
-        .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); grid-auto-rows: 250px; gap: 1.5rem; width: 100%; max-width: 1200px; }
+        
+        /* OTIMIZAÇÃO: Grid mais juntinho (gap 1rem) e cards um pouco mais baixos (220px) */
+        .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); grid-auto-rows: 220px; gap: 1rem; width: 100%; max-width: 1200px; }
         
         .card {
             border-radius: 24px; text-decoration: none; display: flex; align-items: flex-end; padding: 1.5rem;
@@ -48,7 +54,6 @@ try {
         
         .card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5); z-index: 10; }
         
-        /* O overlay escuro serve tanto para imagens quanto para vídeos */
         .card.has-media::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 70%); z-index: 1; }
         
         .card span {
@@ -58,15 +63,8 @@ try {
 
         .card span i { font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important; font-weight: 900; }
 
-        /* Estilo do Vídeo de Fundo */
         .video-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 0; /* Fica atrás do overlay e do texto */
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; 
         }
 
         .normal { grid-column: span 1; grid-row: span 1; }
@@ -74,74 +72,35 @@ try {
         .span-row-2 { grid-column: span 1; grid-row: span 2; }
         .span-large { grid-column: span 2; grid-row: span 2; }
 
+        /* RESPONSIVIDADE MOBILE (BLOCO ÚNICO LIMPO) */
         @media (max-width: 768px) {
-            .portfolio-grid { grid-template-columns: 1fr; grid-auto-rows: 200px; }
-            .span-col-2, .span-row-2, .span-large { grid-column: span 1; grid-row: span 1; }
-            h1 { font-size: 2.5rem; }
-        }
-        
-        /* CONSERTO DA RESPONSIVIDADE MOBILE */
-        @media (max-width: 768px) {
-            body { 
-                padding: 1.5rem 1rem; /* Reduz margens nas laterais */
-            }
-            header { 
-                margin-bottom: 2rem; 
-            }
-            h1 { 
-                font-size: 2.2rem; /* Impede o título de quebrar a linha mal feito */
-            }
-            nav a {
-                margin: 0 0.5rem;
-                font-size: 1rem;
-            }
+            body { padding: 1rem; }
+            header { margin-bottom: 1.5rem; }
+            h1 { font-size: 2.2rem; }
+            nav a { margin: 0 0.5rem; font-size: 0.95rem; }
             
-            /* Ajustes do Bento Grid (Apenas para index.php) */
-            .portfolio-grid { 
-                grid-template-columns: 1fr; /* Força tudo a ficar em 1 coluna */
-                grid-auto-rows: 180px; /* Reduz a altura dos cards no celular */
-                gap: 1rem; 
-            }
+            .portfolio-grid { grid-template-columns: 1fr; grid-auto-rows: 180px; gap: 1rem; }
             
-            /* O !important quebra as regras do painel para o celular não bugar */
             .card.span-col-2, .card.span-row-2, .card.span-large { 
                 grid-column: span 1 !important; 
                 grid-row: span 1 !important; 
             }
             
-            /* Diminui fontes gigantes no celular e faz quebrar a palavra se for muito longa */
             .card span { 
                 font-size: 1.5rem !important; 
                 word-break: break-word; 
                 white-space: normal;
             }
-
-            /* Ajustes do Sobre e Contato (Para sobre.php e contato.php) */
-            .sobre-container { 
-                flex-direction: column; 
-                gap: 2rem; 
-                text-align: center;
-            }
-            .sobre-foto { 
-                max-width: 100%; 
-            }
-            .sobre-texto h2 {
-                font-size: 1.8rem;
-            }
-            .contato-container { 
-                padding: 2rem 1.5rem; 
-            }
-            .social-buttons { 
-                flex-direction: column; 
-            }
         }
     </style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3592098846517685"
+     crossorigin="anonymous"></script>
 </head>
 <body>
 
     <header>
         <h1>@gusvisentini</h1>
-        <p class="subtitle">Mídia, Ideias, Papiros e IA.</p>
+        <p class="subtitle">Mídia, Código e Ideias.</p>
         <nav>
             <a href="sobre">Sobre</a>
             <a href="contato">Contato</a>
@@ -160,19 +119,15 @@ try {
                 $arquivo_bg = $card['imagem_bg'];
                 $tem_midia = !empty($arquivo_bg);
                 
-                // Descobre se é vídeo ou imagem pela extensão
                 $extensao = $tem_midia ? strtolower(pathinfo($arquivo_bg, PATHINFO_EXTENSION)) : '';
                 $eh_video = in_array($extensao, ['mp4', 'webm']);
                 
-                // Muda a classe para garantir o overlay
                 $classe_media = $tem_midia ? 'has-media' : '';
                 
                 $estilo_bg = "";
                 if ($tem_midia && !$eh_video) {
-                    // É uma imagem ou GIF
                     $estilo_bg = "background-image: url('uploads/" . htmlspecialchars($arquivo_bg) . "');";
                 } elseif (!$tem_midia) {
-                    // Sem mídia, usa o degradê
                     $estilo_bg = "background: var(--" . htmlspecialchars($card['gradiente']) . ");";
                 }
 
@@ -189,7 +144,6 @@ try {
             <a href="<?= htmlspecialchars($card['link']) ?>" target="_blank" class="card <?= htmlspecialchars($card['tamanho']) ?> <?= $classe_media ?>" style="<?= $estilo_bg ?>">
                 
                 <?php if ($eh_video): ?>
-                    <!-- Player de Vídeo em Loop -->
                     <video autoplay loop muted playsinline class="video-bg">
                         <source src="uploads/<?= htmlspecialchars($arquivo_bg) ?>" type="video/<?= $extensao ?>">
                     </video>
