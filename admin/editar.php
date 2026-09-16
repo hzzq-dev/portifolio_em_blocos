@@ -18,7 +18,12 @@ if (!$card) {
     exit;
 }
 
+// Puxa as páginas do banco para popular o menu de seleção
+$stmtPaginas = $pdo->query("SELECT slug, titulo FROM paginas ORDER BY ordem ASC, id ASC");
+$paginas = $stmtPaginas->fetchAll(PDO::FETCH_ASSOC);
+
 // Valores padrão caso as novas colunas ainda estejam vazias
+$pagina_slug = $card['pagina_slug'] ?? 'home';
 $font_family = $card['font_family'] ?? 'Inter';
 $font_size = $card['font_size'] ?? '1.8rem';
 $font_weight = $card['font_weight'] ?? '900';
@@ -62,6 +67,21 @@ $icone = $card['icone'] ?? '';
         <div class="control">
           <input class="input" type="url" name="link" value="<?= htmlspecialchars($card['link']) ?>" required>
         </div>
+      </div>
+
+      <!-- NOVO CAMPO: Edição da Página de Destino -->
+      <div class="field">
+        <label class="label">Página de Destino</label>
+        <div class="select is-fullwidth">
+          <select name="pagina_slug" required>
+            <?php foreach($paginas as $pag): ?>
+                <option value="<?= htmlspecialchars($pag['slug']) ?>" <?= $pagina_slug === $pag['slug'] ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($pag['titulo']) ?>
+                </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <p class="help">Escolha em qual página do menu este card deve ser exibido.</p>
       </div>
 
       <div class="columns">

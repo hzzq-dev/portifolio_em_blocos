@@ -1,6 +1,11 @@
 <?php
 // admin/form_card.php
 require_once 'seguranca.php';
+require_once 'db.php';
+
+// Puxa as páginas do banco para popular o menu de seleção
+$stmt = $pdo->query("SELECT slug, titulo FROM paginas ORDER BY ordem ASC, id ASC");
+$paginas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -38,6 +43,20 @@ require_once 'seguranca.php';
         </div>
       </div>
 
+      <div class="field">
+        <label class="label">Página de Destino</label>
+        <div class="select is-fullwidth">
+          <select name="pagina_slug" required>
+            <?php foreach($paginas as $pag): ?>
+                <option value="<?= htmlspecialchars($pag['slug']) ?>">
+                    <?= htmlspecialchars($pag['titulo']) ?>
+                </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <p class="help">Escolha em qual página do menu este card deve ser exibido.</p>
+      </div>
+
       <div class="columns">
         <div class="column">
           <div class="field">
@@ -68,7 +87,6 @@ require_once 'seguranca.php';
         </div>
       </div>
 
-      <!-- INÍCIO: NOVOS CAMPOS DE TEXTO E TIPOGRAFIA -->
       <div class="box mt-4 mb-4" style="background-color: #f9f9f9; border-radius: 12px;">
         <h3 class="subtitle is-5">Aparência do Texto e Ícone</h3>
         
@@ -149,13 +167,13 @@ require_once 'seguranca.php';
 
         </div>
       </div>
-      <!-- FIM: NOVOS CAMPOS -->
 
       <div class="field mt-5">
         <label class="label">Mídia de Fundo (Imagem ou Vídeo MP4/WebM)</label>
-<div class="control">
-    <input class="input" type="file" name="imagem_bg" accept="image/*,video/mp4,video/webm">
-</div>
+        <div class="control">
+            <input class="input" type="file" name="imagem_bg" accept="image/*,video/mp4,video/webm">
+        </div>
+      </div>
 
       <div class="control mt-6 mb-5">
         <button type="submit" class="button is-link is-medium is-fullwidth">Salvar Novo Card</button>

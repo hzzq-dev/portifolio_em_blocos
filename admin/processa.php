@@ -6,6 +6,7 @@ require_once 'seguranca.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $titulo = $_POST['titulo'] ?? '';
     $link = $_POST['link'] ?? '';
+    $pagina_slug = $_POST['pagina_slug'] ?? 'home'; // <-- NOVO CAMPO: Captura a página de destino
     $tamanho = $_POST['tamanho'] ?? 'normal';
     $gradiente = $_POST['gradiente'] ?? 'grad-pride';
     $font_family = $_POST['font_family'] ?? 'Inter';
@@ -33,8 +34,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-        $stmt = $pdo->prepare("INSERT INTO cards (titulo, link, tamanho, gradiente, font_family, font_size, font_weight, font_style, text_color, icone, imagem_bg) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$titulo, $link, $tamanho, $gradiente, $font_family, $font_size, $font_weight, $font_style, $text_color, $icone, $imagem_bg]);
+        // A query agora inclui o campo 'pagina_slug'
+        $stmt = $pdo->prepare("INSERT INTO cards (titulo, link, pagina_slug, tamanho, gradiente, font_family, font_size, font_weight, font_style, text_color, icone, imagem_bg) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        
+        // A variável $pagina_slug foi adicionada ao array de execução
+        $stmt->execute([$titulo, $link, $pagina_slug, $tamanho, $gradiente, $font_family, $font_size, $font_weight, $font_style, $text_color, $icone, $imagem_bg]);
     } catch (Exception $e) {
         die("Erro ao salvar no banco: " . $e->getMessage());
     }

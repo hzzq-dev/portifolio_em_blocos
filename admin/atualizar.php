@@ -7,6 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = $_POST['id'];
     $titulo = $_POST['titulo'] ?? '';
     $link = $_POST['link'] ?? '';
+    $pagina_slug = $_POST['pagina_slug'] ?? 'home'; // NOVO: Captura a página
     $tamanho = $_POST['tamanho'] ?? 'normal';
     $gradiente = $_POST['gradiente'] ?? 'grad-pride';
     $font_family = $_POST['font_family'] ?? 'Inter';
@@ -17,8 +18,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $icone = $_POST['icone'] ?? '';
 
     $remover_imagem = $_POST['remover_imagem'] ?? '0'; 
-    $campos = "titulo = ?, link = ?, tamanho = ?, gradiente = ?, font_family = ?, font_size = ?, font_weight = ?, font_style = ?, text_color = ?, icone = ?";
-    $parametros = [$titulo, $link, $tamanho, $gradiente, $font_family, $font_size, $font_weight, $font_style, $text_color, $icone];
+    // NOVO: Adicionado pagina_slug = ? no SQL
+    $campos = "titulo = ?, link = ?, pagina_slug = ?, tamanho = ?, gradiente = ?, font_family = ?, font_size = ?, font_weight = ?, font_style = ?, text_color = ?, icone = ?";
+    
+    // NOVO: Adicionado $pagina_slug no array de parâmetros
+    $parametros = [$titulo, $link, $pagina_slug, $tamanho, $gradiente, $font_family, $font_size, $font_weight, $font_style, $text_color, $icone];
 
     $nova_imagem_enviada = isset($_FILES['imagem_bg']) && $_FILES['imagem_bg']['error'] === UPLOAD_ERR_OK;
 

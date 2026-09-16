@@ -2,11 +2,22 @@
 // index.php (RAIZ DO SITE)
 require_once __DIR__ . '/admin/db.php';
 
+// Descobre qual página o usuário quer acessar (se não tiver nada, é a 'home')
+$pagina_atual = $_GET['p'] ?? 'home';
+
 try {
-    $stmt = $pdo->query("SELECT * FROM cards ORDER BY ordem ASC, id DESC");
-    $cards = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // 1. Busca os itens do menu dinâmico
+    $stmtMenu = $pdo->query("SELECT * FROM paginas ORDER BY ordem ASC, id ASC");
+    $menu_paginas = $stmtMenu->fetchAll(PDO::FETCH_ASSOC);
+
+    // 2. Busca os cards APENAS da página selecionada
+    $stmtCards = $pdo->prepare("SELECT * FROM cards WHERE pagina_slug = ? ORDER BY ordem ASC, id DESC");
+    $stmtCards->execute([$pagina_atual]);
+    $cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
+    
 } catch (Exception $e) {
     $cards = [];
+    $menu_paginas = [];
 }
 ?>
 <!DOCTYPE html>
@@ -33,17 +44,14 @@ try {
 
         * { box-sizing: border-box; }
         
-        /* OTIMIZAÇÃO: Menos espaço em branco, flex centralizado */
         body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; margin: 0; padding: 1.5rem 1rem; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         
-        /* OTIMIZAÇÃO: Cabeçalho compacto */
         header { text-align: center; margin-bottom: 1.5rem; margin-top: 0; width: 100%; max-width: 1200px; }
         h1 { font-size: 3rem; font-weight: 900; letter-spacing: -2px; margin: 0; background: var(--grad-pride); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .subtitle { font-size: 1rem; color: #888; margin-top: 0.2rem; margin-bottom: 1rem; }
         nav a { color: #fff; text-decoration: none; font-weight: 700; font-size: 1rem; margin: 0 1rem; padding-bottom: 5px; border-bottom: 2px solid transparent; transition: border-color 0.3s ease, color 0.3s ease; }
         nav a:hover { color: #FFD800; border-bottom: 2px solid #FFD800; }
         
-        /* OTIMIZAÇÃO: Grid mais juntinho (gap 1rem) e cards um pouco mais baixos (220px) */
         .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); grid-auto-rows: 220px; gap: 1rem; width: 100%; max-width: 1200px; }
         
         .card {
@@ -72,7 +80,6 @@ try {
         .span-row-2 { grid-column: span 1; grid-row: span 2; }
         .span-large { grid-column: span 2; grid-row: span 2; }
 
-        /* RESPONSIVIDADE MOBILE (BLOCO ÚNICO LIMPO) */
         @media (max-width: 768px) {
             body { padding: 1rem; }
             header { margin-bottom: 1.5rem; }
@@ -99,9 +106,18 @@ try {
 <body>
 
     <header>
-        <h1>@gusvisentini</h1>
+        <a href="?p=home" style="text-decoration: none;"><h1>@gusvisentini</h1></a>
         <p class="subtitle">Mídia, Código e Ideias.</p>
         <nav>
+            <!-- 1. Puxa as páginas dinâmicas (Cards) do banco de dados -->
+            <?php foreach($menu_paginas as $item): ?>
+                <a href="?p=<?= htmlspecialchars($item['slug']) ?>" 
+                   <?= $item['slug'] === $pagina_atual ? 'style="color: #FFD800; border-bottom: 2px solid #FFD800;"' : '' ?>>
+                    <?= htmlspecialchars($item['titulo']) ?>
+                </a>
+            <?php endforeach; ?>
+            
+            <!-- 2. Mantém as suas páginas físicas fixas no menu -->
             <a href="sobre">Sobre</a>
             <a href="contato">Contato</a>
         </nav>
@@ -111,7 +127,7 @@ try {
         
         <?php if (empty($cards)): ?>
             <p style="text-align: center; width: 100%; grid-column: 1 / -1; color: #666;">
-                Nenhum card cadastrado ainda. Acesse o <a href="admin/" style="color: #FFD800;">Painel</a> para começar.
+                Nenhum card cadastrado ainda nesta página. Acesse o <a href="admin/" style="color: #FFD800;">Painel</a> para começar.
             </p>
         <?php else: ?>
             

@@ -1,3 +1,12 @@
+<?php
+require_once __DIR__ . '/admin/db.php';
+try {
+    $stmtMenu = $pdo->query("SELECT * FROM paginas ORDER BY ordem ASC, id ASC");
+    $menu_paginas = $stmtMenu->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    $menu_paginas = [];
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -98,7 +107,14 @@
         <a href="/" style="text-decoration: none;"><h1>@gusvisentini</h1></a>
         <p class="subtitle">Mídia, Código e Ideias.</p>
         <nav>
-            <a href="/">Início</a>
+            <!-- Páginas Dinâmicas do Banco de Dados -->
+            <?php foreach($menu_paginas as $item): ?>
+                <a href="/?p=<?= htmlspecialchars($item['slug']) ?>">
+                    <?= htmlspecialchars($item['titulo']) ?>
+                </a>
+            <?php endforeach; ?>
+            
+            <!-- Páginas Fixas -->
             <a href="sobre" style="border-bottom: 2px solid #FFD800; color: #FFD800;">Sobre</a>
             <a href="contato">Contato</a>
         </nav>

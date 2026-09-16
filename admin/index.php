@@ -32,6 +32,7 @@ $cards = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </a>
                     
                     <a href="form_card" class="button is-link ml-2"><b>+ Novo Card</b></a>
+                    <a href="paginas.php" class="button is-info is-light"><i class="fa-solid fa-folder-tree" style="margin-right: 8px;"></i>Gerenciar Páginas</a>
                     <a href="/" class="button is-light ml-2" target="_blank">Ver Site</a>
                     <a href="logout" class="button is-danger is-light ml-2">Sair</a>
                 </div>
