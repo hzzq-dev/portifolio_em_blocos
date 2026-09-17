@@ -155,9 +155,20 @@ try {
                     htmlspecialchars($card['font_style'] ?? 'normal'),
                     htmlspecialchars($card['text_color'] ?? '#ffffff')
                 );
+
+                // ========================================================
+                // LÓGICA DA ABA: Define se abre em nova aba ou na mesma
+                // ========================================================
+                $dominio_atual = $_SERVER['HTTP_HOST'];
+                $target = "_blank"; // Padrão: abrir em nova aba
+                
+                // Se o link NÃO contiver 'http' (link interno) OU se tiver o seu domínio
+                if (strpos($card['link'], 'http') === false || strpos($card['link'], $dominio_atual) !== false) {
+                    $target = "_self"; // Abre na mesma aba
+                }
             ?>
             
-            <a href="<?= htmlspecialchars($card['link']) ?>" target="_blank" class="card <?= htmlspecialchars($card['tamanho']) ?> <?= $classe_media ?>" style="<?= $estilo_bg ?>">
+            <a href="<?= htmlspecialchars($card['link']) ?>" target="<?= $target ?>" class="card <?= htmlspecialchars($card['tamanho']) ?> <?= $classe_media ?>" style="<?= $estilo_bg ?>">
                 
                 <?php if ($eh_video): ?>
                     <video autoplay loop muted playsinline class="video-bg">
