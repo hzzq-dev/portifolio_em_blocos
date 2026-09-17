@@ -44,8 +44,7 @@ Um sistema de portfólio dinâmico, leve e totalmente customizável construído 
 
 ---
 
-Veja em tempo real aqui: [https://visentini.com.br](https://visentini.com.br)
-Dúvidas, sugestões ou pedidos: 📧 github@hzzq.com.br
+Veja em tempo real aqui: [https://visentini.com.br](https://visentini.com.br) - Dúvidas, sugestões ou pedidos: 📧 github@hzzq.com.br
 
 <img width="1364" height="896" alt="image" src="https://github.com/user-attachments/assets/07a34cfc-af6f-4bb2-bada-2a341b7eba35" />
 
