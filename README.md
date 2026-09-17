@@ -42,7 +42,10 @@ Um sistema de portfólio dinâmico, leve e totalmente customizável construído 
 * O arquivo `config.php` está obrigatoriamente incluído no arquivo `.gitignore`. Senhas, chaves privadas do Google e Tokens de versionamento nunca devem ser enviados para o repositório público.
 * A página principal identifica a origem dos links dinamicamente, abrindo páginas de terceiros em novas abas visando retenção de usuário, enquanto a navegação em links do próprio domínio mantém o tráfego na mesma janela.
 
+---
 
 Você pode ver em tempo real aqui: [https://visentini.com.br](https://visentini.com.br)
+Dúvidas, sugestões ou pedidos - 📧 github@hzzq.com.br
 
 <img width="1364" height="896" alt="image" src="https://github.com/user-attachments/assets/07a34cfc-af6f-4bb2-bada-2a341b7eba35" />
+
