@@ -1,11 +1,21 @@
 <?php
 require_once __DIR__ . '/admin/db.php';
+
 try {
+    $stmtConfig = $pdo->query("SELECT chave, valor FROM configuracoes");
+    $configs = $stmtConfig->fetchAll(PDO::FETCH_KEY_PAIR);
+    $menu_fixo = ($configs['menu_fixo'] ?? '1') === '1';
+    $estilo_menu_bloco = ($configs['estilo_menu_bloco'] ?? '1') === '1';
+
     $stmtMenu = $pdo->query("SELECT * FROM paginas ORDER BY ordem ASC, id ASC");
     $menu_paginas = $stmtMenu->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     $menu_paginas = [];
+    $menu_fixo = false;
+    $estilo_menu_bloco = false;
 }
+
+$pagina_atual = 'sobre';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -27,73 +37,34 @@ try {
 
         * { box-sizing: border-box; }
         
-        /* OTIMIZAÇÃO: Menos espaço em branco, flex centralizado */
         body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; margin: 0; padding: 1.5rem 1rem; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         
-        /* OTIMIZAÇÃO: Cabeçalho compacto */
-        header { text-align: center; margin-bottom: 1.5rem; margin-top: 0; width: 100%; max-width: 1200px; }
+        /* CABEÇALHO E MENU CONFIGURÁVEIS */
+        header { text-align: center; margin-bottom: 1.5rem; margin-top: 0; width: 100%; max-width: 1200px; padding-top: 1rem; padding-bottom: 1rem; transition: all 0.3s ease; }
+        header.is-fixed { position: sticky; top: 0; z-index: 100; background-color: rgba(15, 15, 17, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.05); }
         h1 { font-size: 3rem; font-weight: 900; letter-spacing: -2px; margin: 0; background: var(--grad-pride); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .subtitle { font-size: 1rem; color: #888; margin-top: 0.2rem; margin-bottom: 1rem; }
-        nav a { color: #fff; text-decoration: none; font-weight: 700; font-size: 1rem; margin: 0 1rem; padding-bottom: 5px; border-bottom: 2px solid transparent; transition: border-color 0.3s ease, color 0.3s ease; }
-        nav a:hover { color: #FFD800; border-bottom: 2px solid #FFD800; }
+        
+        nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; }
+        nav a { color: #fff; text-decoration: none; font-weight: 700; font-size: 0.95rem; transition: all 0.3s ease; }
+        
+        .menu-blocos a { background-color: rgba(255, 255, 255, 0.08); padding: 0.6rem 1.2rem; border-radius: 50px; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .menu-blocos a:hover { background-color: rgba(255, 255, 255, 0.15); transform: translateY(-2px); }
+        .menu-blocos a.active { background-color: #FFD800; color: #000; border-color: #FFD800; }
+        
+        .menu-simples a { margin: 0 0.5rem; padding-bottom: 5px; border-bottom: 2px solid transparent; }
+        .menu-simples a:hover, .menu-simples a.active { color: #FFD800; border-bottom: 2px solid #FFD800; }
 
-        /* LAYOUT SOBRE OTIMIZADO */
-        .sobre-container {
-            display: flex;
-            gap: 2.5rem; /* OTIMIZAÇÃO: Gap menor entre foto e texto */
-            max-width: 1000px;
-            width: 100%;
-            align-items: center;
-        }
-
-        .sobre-foto {
-            flex: 1;
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            position: relative;
-        }
-
-        .sobre-foto::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top right, rgba(255,0,24,0.2), rgba(0,0,249,0.2));
-            pointer-events: none;
-        }
-
-        .sobre-foto img {
-            width: 100%;
-            height: auto;
-            display: block;
-            object-fit: cover;
-        }
-
-        .sobre-texto {
-            flex: 1.5;
-            font-size: 1.15rem; /* Levemente menor para caber melhor na tela */
-            line-height: 1.7;
-            color: #d1d1d1;
-        }
-
-        .sobre-texto h2 {
-            font-size: 2.5rem;
-            color: #fff;
-            margin-top: 0;
-            margin-bottom: 1.2rem;
-            font-weight: 900;
-            letter-spacing: -1px;
-        }
-
-        .highlight {
-            color: #fff;
-            font-weight: bold;
-            background: var(--grad-pride);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .sobre-container { display: flex; gap: 2.5rem; max-width: 1000px; width: 100%; align-items: center; }
+        .sobre-foto { flex: 1; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5); position: relative; }
+        .sobre-foto::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top right, rgba(255,0,24,0.2), rgba(0,0,249,0.2)); pointer-events: none; }
+        .sobre-foto img { width: 100%; height: auto; display: block; object-fit: cover; }
+        .sobre-texto { flex: 1.5; font-size: 1.15rem; line-height: 1.7; color: #d1d1d1; }
+        .sobre-texto h2 { font-size: 2.5rem; color: #fff; margin-top: 0; margin-bottom: 1.2rem; font-weight: 900; letter-spacing: -1px; }
+        .highlight { color: #fff; font-weight: bold; background: var(--grad-pride); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         @media (max-width: 768px) {
+            header { padding-top: 1rem; margin-bottom: 1rem; }
             .sobre-container { flex-direction: column; gap: 1.5rem; text-align: center; }
             h1 { font-size: 2.2rem; }
             .sobre-foto { width: 100%; max-width: 400px; margin: 0 auto; }
@@ -103,20 +74,18 @@ try {
 </head>
 <body>
 
-    <header>
+    <header class="<?= $menu_fixo ? 'is-fixed' : '' ?>">
         <a href="/" style="text-decoration: none;"><h1>@gusvisentini</h1></a>
         <p class="subtitle">Mídia, Código e Ideias.</p>
-        <nav>
-            <!-- Páginas Dinâmicas do Banco de Dados -->
+        <nav class="<?= $estilo_menu_bloco ? 'menu-blocos' : 'menu-simples' ?>">
+            <a href="/">Início</a>
             <?php foreach($menu_paginas as $item): ?>
                 <a href="/?p=<?= htmlspecialchars($item['slug']) ?>">
                     <?= htmlspecialchars($item['titulo']) ?>
                 </a>
             <?php endforeach; ?>
-            
-            <!-- Páginas Fixas -->
-            <a href="sobre" style="border-bottom: 2px solid #FFD800; color: #FFD800;">Sobre</a>
-            <a href="contato">Contato</a>
+            <a href="sobre" class="<?= $pagina_atual === 'sobre' ? 'active' : '' ?>">Sobre</a>
+            <a href="contato" class="<?= $pagina_atual === 'contato' ? 'active' : '' ?>">Contato</a>
         </nav>
     </header>
 

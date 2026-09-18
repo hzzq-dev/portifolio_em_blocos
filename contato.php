@@ -11,13 +11,24 @@ require 'src/SMTP.php';
 // Chama o cofre de senhas
 require_once 'config.php';
 require_once __DIR__ . '/admin/db.php';
+
 try {
+    // Busca configurações visuais
+    $stmtConfig = $pdo->query("SELECT chave, valor FROM configuracoes");
+    $configs = $stmtConfig->fetchAll(PDO::FETCH_KEY_PAIR);
+    $menu_fixo = ($configs['menu_fixo'] ?? '1') === '1';
+    $estilo_menu_bloco = ($configs['estilo_menu_bloco'] ?? '1') === '1';
+
+    // Busca as páginas
     $stmtMenu = $pdo->query("SELECT * FROM paginas ORDER BY ordem ASC, id ASC");
     $menu_paginas = $stmtMenu->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     $menu_paginas = [];
+    $menu_fixo = false;
+    $estilo_menu_bloco = false;
 }
 
+$pagina_atual = 'contato';
 $mensagem_feedback = '';
 $tipo_feedback = ''; 
 
@@ -48,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             
             $response = curl_exec($ch);
-            $curl_erro = curl_error($ch); // Captura o erro da Hostinger, se houver
+            $curl_erro = curl_error($ch);
             curl_close($ch);
             
             $result = json_decode($response);
@@ -87,7 +98,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $tipo_feedback = 'erro';
                 }
             } else {
-                // MODO DEPURADOR: Exibe a resposta crua do Google ou do Servidor
                 $debug_info = $response ? $response : "FALHA DE CONEXÃO cURL: " . $curl_erro;
                 $mensagem_feedback = "DEBUG DO SISTEMA: " . htmlspecialchars($debug_info);
                 $tipo_feedback = 'erro';
@@ -111,7 +121,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Script oficial do Google reCAPTCHA -->
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
     <style>
@@ -122,11 +131,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         * { box-sizing: border-box; }
         body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; margin: 0; padding: 1rem; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        header { text-align: center; margin-bottom: 1.5rem; margin-top: 0; width: 100%; max-width: 1200px; }
+        
+        /* CABEÇALHO E MENU CONFIGURÁVEIS */
+        header { text-align: center; margin-bottom: 1.5rem; margin-top: 0; width: 100%; max-width: 1200px; padding-top: 1rem; padding-bottom: 1rem; transition: all 0.3s ease; }
+        header.is-fixed { position: sticky; top: 0; z-index: 100; background-color: rgba(15, 15, 17, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.05); }
         h1 { font-size: 3rem; font-weight: 900; letter-spacing: -2px; margin: 0; background: var(--grad-pride); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .subtitle { font-size: 1rem; color: #888; margin-top: 0.2rem; margin-bottom: 1rem; }
-        nav a { color: #fff; text-decoration: none; font-weight: 700; font-size: 1rem; margin: 0 1rem; padding-bottom: 5px; border-bottom: 2px solid transparent; transition: border-color 0.3s ease, color 0.3s ease; }
-        nav a:hover { color: #FFD800; border-bottom: 2px solid #FFD800; }
+        
+        nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; }
+        nav a { color: #fff; text-decoration: none; font-weight: 700; font-size: 0.95rem; transition: all 0.3s ease; }
+        
+        .menu-blocos a { background-color: rgba(255, 255, 255, 0.08); padding: 0.6rem 1.2rem; border-radius: 50px; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .menu-blocos a:hover { background-color: rgba(255, 255, 255, 0.15); transform: translateY(-2px); }
+        .menu-blocos a.active { background-color: #FFD800; color: #000; border-color: #FFD800; }
+        
+        .menu-simples a { margin: 0 0.5rem; padding-bottom: 5px; border-bottom: 2px solid transparent; }
+        .menu-simples a:hover, .menu-simples a.active { color: #FFD800; border-bottom: 2px solid #FFD800; }
+
         .contato-container { max-width: 600px; width: 100%; background-color: #1a1a1d; padding: 2rem; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); }
         .form-group { margin-bottom: 1rem; }
         label { display: block; margin-bottom: 0.3rem; font-weight: 700; color: #bbb; font-size: 0.9rem; }
@@ -149,15 +170,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .btn-social:hover { transform: translateY(-3px); }
         .btn-whats:hover { box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3); }
         .btn-telegram:hover { box-shadow: 0 10px 20px rgba(0, 136, 204, 0.3); }
-        
-        /* Centraliza a caixa do reCAPTCHA */
         .recaptcha-container { display: flex; justify-content: center; margin-bottom: 1rem; }
 
         @media (max-width: 768px) {
             body { padding: 1rem; }
-            header { margin-bottom: 1.5rem; }
+            header { margin-bottom: 1.5rem; padding-top: 1rem; }
             h1 { font-size: 2.2rem; }
-            nav a { margin: 0 0.5rem; font-size: 0.95rem; }
             .contato-container { padding: 1.5rem; }
             .social-buttons { flex-direction: column; }
         }
@@ -165,25 +183,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
 
-    <header>
+    <header class="<?= $menu_fixo ? 'is-fixed' : '' ?>">
         <a href="/" style="text-decoration: none;"><h1>@gusvisentini</h1></a>
         <p class="subtitle">Mídia, Código e Ideias.</p>
-       <nav>
-            <!-- Páginas Dinâmicas do Banco de Dados -->
+        <nav class="<?= $estilo_menu_bloco ? 'menu-blocos' : 'menu-simples' ?>">
+            <a href="/">Início</a>
             <?php foreach($menu_paginas as $item): ?>
                 <a href="/?p=<?= htmlspecialchars($item['slug']) ?>">
                     <?= htmlspecialchars($item['titulo']) ?>
                 </a>
             <?php endforeach; ?>
-            
-            <!-- Páginas Fixas -->
-            <a href="sobre">Sobre</a>
-            <a href="contato" style="border-bottom: 2px solid #FFD800; color: #FFD800;">Contato</a>
+            <a href="sobre" class="<?= $pagina_atual === 'sobre' ? 'active' : '' ?>">Sobre</a>
+            <a href="contato" class="<?= $pagina_atual === 'contato' ? 'active' : '' ?>">Contato</a>
         </nav>
     </header>
 
     <main class="contato-container">
-        
         <?php if (!empty($mensagem_feedback)): ?>
             <div class="feedback <?= $tipo_feedback ?>">
                 <?= $mensagem_feedback ?>
@@ -195,24 +210,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label for="nome">Como você se chama?</label>
                 <input type="text" id="nome" name="nome" placeholder="Seu nome" required>
             </div>
-            
             <div class="form-group">
                 <label for="email">Seu e-mail</label>
                 <input type="email" id="email" name="email" placeholder="nome@exemplo.com" required>
             </div>
-            
             <div class="form-group">
                 <label for="mensagem">No que posso ajudar?</label>
                 <textarea id="mensagem" name="mensagem" placeholder="Escreva sua mensagem aqui..." required></textarea>
             </div>
-            
-            <!-- CAIXA DO RECAPTCHA -->
             <div class="recaptcha-container">
-                <!-- ⚠️ ATENÇÃO: COLE SUA CHAVE DO SITE (SITE KEY) AQUI -->
-                <!-- Você precisa gerar essa chave em: https://www.google.com/recaptcha/admin -->
                 <div class="g-recaptcha" data-sitekey="6LfjNqUtAAAAAJib2FdnTNEg8e31AY7SKVtGZxeF" data-theme="dark"></div>
             </div>
-            
             <button type="submit">Enviar Mensagem</button>
         </form>
 
