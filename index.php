@@ -6,6 +6,14 @@ require_once __DIR__ . '/admin/db.php';
 $pagina_atual = $_GET['p'] ?? 'home';
 
 try {
+    // ==========================================
+    // ⚙️ CONFIGURAÇÕES VISUAIS DO MENU (Via Banco)
+    // ==========================================
+    $stmtConfig = $pdo->query("SELECT chave, valor FROM configuracoes");
+    $configs = $stmtConfig->fetchAll(PDO::FETCH_KEY_PAIR);
+    $menu_fixo = ($configs['menu_fixo'] ?? '1') === '1';
+    $estilo_menu_bloco = ($configs['estilo_menu_bloco'] ?? '1') === '1';
+
     // 1. Busca os itens do menu dinâmico
     $stmtMenu = $pdo->query("SELECT * FROM paginas ORDER BY ordem ASC, id ASC");
     $menu_paginas = $stmtMenu->fetchAll(PDO::FETCH_ASSOC);
@@ -18,6 +26,8 @@ try {
 } catch (Exception $e) {
     $cards = [];
     $menu_paginas = [];
+    $menu_fixo = false;
+    $estilo_menu_bloco = false;
 }
 ?>
 <!DOCTYPE html>
@@ -44,15 +54,51 @@ try {
 
         * { box-sizing: border-box; }
         
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; margin: 0; padding: 1.5rem 1rem; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; margin: 0; padding: 0 1rem 2rem 1rem; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
         
-        header { text-align: center; margin-bottom: 1.5rem; margin-top: 0; width: 100%; max-width: 1200px; }
+        /* ==========================================
+           ESTILOS DO CABEÇALHO E MENU
+           ========================================== */
+        header { 
+            text-align: center; margin-bottom: 2rem; width: 100%; max-width: 1200px; 
+            padding-top: 2rem; padding-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        header.is-fixed {
+            position: sticky; top: 0; z-index: 100;
+            background-color: rgba(15, 15, 17, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-top: 1rem;
+        }
+
         h1 { font-size: 3rem; font-weight: 900; letter-spacing: -2px; margin: 0; background: var(--grad-pride); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .subtitle { font-size: 1rem; color: #888; margin-top: 0.2rem; margin-bottom: 1rem; }
-        nav a { color: #fff; text-decoration: none; font-weight: 700; font-size: 1rem; margin: 0 1rem; padding-bottom: 5px; border-bottom: 2px solid transparent; transition: border-color 0.3s ease, color 0.3s ease; }
-        nav a:hover { color: #FFD800; border-bottom: 2px solid #FFD800; }
+        .subtitle { font-size: 1rem; color: #888; margin-top: 0.2rem; margin-bottom: 1.5rem; }
         
-        .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); grid-auto-rows: 220px; gap: 1rem; width: 100%; max-width: 1200px; }
+        nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; }
+        nav a { color: #fff; text-decoration: none; font-weight: 700; font-size: 0.95rem; transition: all 0.3s ease; }
+        
+        /* ESTILO 1: BLOCOS ARREDONDADOS */
+        .menu-blocos a {
+            background-color: rgba(255, 255, 255, 0.08);
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .menu-blocos a:hover { background-color: rgba(255, 255, 255, 0.15); transform: translateY(-2px); }
+        .menu-blocos a.active { background-color: #FFD800; color: #000; border-color: #FFD800; }
+
+        /* ESTILO 2: TEXTO SIMPLES */
+        .menu-simples a { margin: 0 0.5rem; padding-bottom: 5px; border-bottom: 2px solid transparent; }
+        .menu-simples a:hover { color: #FFD800; border-bottom: 2px solid #FFD800; }
+        .menu-simples a.active { color: #FFD800; border-bottom: 2px solid #FFD800; }
+
+        /* ==========================================
+           GRID DE CARDS (O seu layout original)
+           ========================================== */
+        .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); grid-auto-rows: 220px; gap: 1rem; width: 100%; max-width: 1200px; grid-auto-flow: dense; }
         
         .card {
             border-radius: 24px; text-decoration: none; display: flex; align-items: flex-end; padding: 1.5rem;
@@ -81,20 +127,41 @@ try {
         .span-large { grid-column: span 2; grid-row: span 2; }
 
         @media (max-width: 768px) {
-            body { padding: 1rem; }
-            header { margin-bottom: 1.5rem; }
+            header { padding-top: 1.5rem; margin-bottom: 1rem; }
             h1 { font-size: 2.2rem; }
-            nav a { margin: 0 0.5rem; font-size: 0.95rem; }
             
-            .portfolio-grid { grid-template-columns: 1fr; grid-auto-rows: 180px; gap: 1rem; }
+            /* Grid mobile com 2 colunas e preenchimento automático (dense) */
+            .portfolio-grid { 
+                grid-template-columns: repeat(2, 1fr); 
+                grid-auto-rows: 150px; 
+                gap: 0.8rem;
+            }
             
-            .card.span-col-2, .card.span-row-2, .card.span-large { 
+            /* 1x1 (Normal) e 2x2 (Gigante): Ficam quadrados (1 coluna), um do lado do outro */
+            .card.normal, .card.span-large { 
                 grid-column: span 1 !important; 
                 grid-row: span 1 !important; 
             }
+
+            /* 1x2 (Alto): Fica um do lado do outro (1 coluna), mas esticado para baixo (2 linhas) */
+            .card.span-row-2 {
+                grid-column: span 1 !important;
+                grid-row: span 2 !important;
+            }
+
+            /* 2x1 (Largo): Ocupa as 2 colunas da tela mobile, forçando ficar um abaixo do outro */
+            .card.span-col-2 {
+                grid-column: span 2 !important;
+                grid-row: span 1 !important;
+            }
             
+            .card {
+                padding: 1rem; 
+                border-radius: 18px; 
+            }
+            
+            /* Mantendo quebra de texto para não vazar do bloco */
             .card span { 
-                font-size: 1.5rem !important; 
                 word-break: break-word; 
                 white-space: normal;
             }
@@ -105,21 +172,24 @@ try {
 </head>
 <body>
 
-    <header>
+    <!-- A classe is-fixed é adicionada dinamicamente via banco de dados -->
+    <header class="<?= $menu_fixo ? 'is-fixed' : '' ?>">
         <a href="?p=home" style="text-decoration: none;"><h1>@gusvisentini</h1></a>
         <p class="subtitle">Mídia, Código e Ideias.</p>
-        <nav>
+        
+        <!-- A classe menu-blocos ou menu-simples é adicionada dinamicamente -->
+        <nav class="<?= $estilo_menu_bloco ? 'menu-blocos' : 'menu-simples' ?>">
             <!-- 1. Puxa as páginas dinâmicas (Cards) do banco de dados -->
             <?php foreach($menu_paginas as $item): ?>
                 <a href="?p=<?= htmlspecialchars($item['slug']) ?>" 
-                   <?= $item['slug'] === $pagina_atual ? 'style="color: #FFD800; border-bottom: 2px solid #FFD800;"' : '' ?>>
+                   class="<?= $item['slug'] === $pagina_atual ? 'active' : '' ?>">
                     <?= htmlspecialchars($item['titulo']) ?>
                 </a>
             <?php endforeach; ?>
             
             <!-- 2. Mantém as suas páginas físicas fixas no menu -->
-            <a href="sobre">Sobre</a>
-            <a href="contato">Contato</a>
+            <a href="sobre" class="<?= $pagina_atual === 'sobre' ? 'active' : '' ?>">Sobre</a>
+            <a href="contato" class="<?= $pagina_atual === 'contato' ? 'active' : '' ?>">Contato</a>
         </nav>
     </header>
 

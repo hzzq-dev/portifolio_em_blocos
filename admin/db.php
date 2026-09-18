@@ -50,4 +50,23 @@ foreach ($colunas_novas as $coluna => $tipo) {
 try {
     $pdo->exec("ALTER TABLE cards ADD COLUMN ordem INTEGER DEFAULT 0");
 } catch (PDOException $e) {}
+
+
+// Cria a tabela de configurações
+$pdo->exec("CREATE TABLE IF NOT EXISTS configuracoes (
+    chave TEXT PRIMARY KEY,
+    valor TEXT NOT NULL
+)");
+
+// Insere as configurações padrão se a tabela estiver vazia
+$stmt = $pdo->query("SELECT COUNT(*) FROM configuracoes");
+if ($stmt->fetchColumn() == 0) {
+    $pdo->exec("INSERT INTO configuracoes (chave, valor) VALUES ('menu_fixo', '1')");
+    $pdo->exec("INSERT INTO configuracoes (chave, valor) VALUES ('estilo_menu_bloco', '1')");
+}
+
 ?>
+
+
+
+

@@ -41,7 +41,7 @@ foreach ($todos_cards as $card) {
 </head>
 <body>
     <section class="section">
-        <div class="container" style="max-width: 1000px;">
+        <div class="container" style="max-width: 1100px;">
             
             <div class="level">
                 <div class="level-left">
@@ -57,6 +57,11 @@ foreach ($todos_cards as $card) {
                     
                     <a href="paginas.php" class="button is-info is-light ml-2">
                         <i class="fa-solid fa-folder-tree" style="margin-right: 8px;"></i> Gerenciar Páginas
+                    </a>
+
+                    <!-- NOVO: Botão de Configurações Visuais -->
+                    <a href="configuracoes.php" class="button is-primary is-light ml-2">
+                        <i class="fa-solid fa-sliders" style="margin-right: 8px;"></i> Configurações
                     </a>
                     
                     <a href="../" class="button is-light ml-2" target="_blank">Ver Site</a>
